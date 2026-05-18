@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriVida - Tu Tienda de Nutrición</title>
+    <style>
+        /* ========================
+           CSS - ESTILOS VISUALES
+           ======================== */
+        :root {
+            --primary-color: #2ecc71;
+            --secondary-color: #27ae60;
+            --dark-color: #2c3e50;
+            --light-color: #f4f7f6;
+            --text-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Oculta el scroll de la página mientras esté la pantalla de bienvenida */
+        body {
+            background-color: var(--light-color);
+            color: var(--text-color);
+            overflow: hidden; 
+        }
+
+        /* 1. PANTALLA DE BIENVENIDA */
+        #welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(rgba(44, 62, 80, 0.9), rgba(44, 62, 80, 0.9)), url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1600') center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .welcome-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 500px;
+        }
+
+        .welcome-content h1 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 2.5rem;
+        }
+
+        .welcome-content p {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+
+        .btn-enter {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        .btn-enter:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        /* Encabezado y Navegación */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--dark-color);
+        }
+
+        .contact-link {
+            background-color: white;
+            color: var(--primary-color) !important;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        .contact-link:hover {
+            background-color: var(--dark-color);
+            color: white !important;
+        }
+
+        .cart-btn {
+            background-color: var(--dark-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Contenido Principal */
+        main {
+            padding: 2rem 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .category-title {
+            color: var(--dark-color);
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            margin-top: 30px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        /* Tarjeta de Producto */
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .btn-view {
+            background-color: var(--dark-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-view:hover {
+            background-color: #1a252f;
+        }
+
+        /* 2. VENTANA MODAL DE DETALLES DEL PRODUCTO */
+        #product-modal {
+            display: none; /* Oculto por defecto */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            position: relative;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 2rem;
+            color: #333;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .modal-image {
+            width: 50%;
+            object-fit: cover;
+        }
+
+        .modal-info {
+            padding: 30px;
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .modal-info h2 {
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+
+        .modal-info .full-desc {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .btn-add-cart {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: auto;
+        }
+
+        /* Carrito de Compras Lateral */
+        #cart-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 350px;
+            height: 100vh;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+            z-index: 400;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        #cart-panel.open { right: 0; }
+        .cart-header { display: flex; justify-content: space-between; border-bottom: 2px solid var(--light-color); padding-bottom: 10px; margin-bottom: 20px; }
+        .close-cart { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #e74c3c; }
+        .cart-items { flex-grow: 1; overflow-y: auto; }
+        .cart-item { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+        .checkout-btn { background-color: var(--primary-color); color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; }
+
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        /* Responsividad para la ventana modal en celulares */
+        @media (max-width: 768px) {
+            .modal-content { flex-direction: column; max-height: 90vh; overflow-y: auto;}
+            .modal-image, .modal-info { width: 100%; }
+            .modal-image { height: 250px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. PANTALLA DE BIENVENIDA -->
+    <div id="welcome-screen">
+        <div class="welcome-content">
+            <h1>🌿 NutriVida</h1>
+            <p>Bienvenido a nuestra nueva plataforma digital. Explora nuestro catálogo y lleva tu rendimiento al siguiente nivel.</p>
+            <button class="btn-enter" onclick="enterStore()">Ver Catálogo de Productos</button>
+        </div>
+    </div>
+
+    <!-- Encabezado y Navegación -->
+    <header>
+        <div class="logo-container">
+            <span style="font-size: 2rem;">🌿</span>
+            <h1>NutriVida</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#suplementos">Suplementos</a></li>
+                <li><a href="#vitaminas">Vitaminas</a></li>
+                <!-- 3. ENLACE DE CONTACTO (Rellena el href con tu link) -->
+                <li>
+                    <a href="https://www.instagram.com/nutrivida32875?utm_source=qr&igsh=cTMwanE0ZGtvaXIw" target="_blank" class="contact-link">
+                        📞 Contacto
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <button class="cart-btn" onclick="toggleCart()">🛒 Carrito (<span id="cart-count">0</span>)</button>
+    </header>
+
+    <!-- Contenido Principal (Catálogo) -->
+    <main id="store-content">
+        <!-- Renderizado vía JS -->
+    </main>
+
+    <!-- 2. VENTANA MODAL DE DETALLES -->
+    <div id="product-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeProductModal()">&times;</span>
+            <img id="modal-img" class="modal-image" src="" alt="Producto">
+            <div class="modal-info">
+                <h2 id="modal-title">Nombre Producto</h2>
+                <span id="modal-price" class="product-price">$0.00</span>
+                <p id="modal-desc" class="full-desc">Descripción detallada aquí...</p>
+                
+                <!-- Botón de comprar dentro del modal -->
+                <button id="modal-btn-add" class="btn-add-cart">🛒 Agregar al Carrito</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel del Carrito -->
+    <div id="cart-panel">
+        <div class="cart-header">
+            <h2>Tu Carrito</h2>
+            <button class="close-cart" onclick="toggleCart()">✖</button>
+        </div>
+        <div class="cart-items" id="cart-items-container"><p>El carrito está vacío.</p></div>
+        <div style="font-size: 1.2rem; font-weight: bold; margin: 20px 0;">Total: $<span id="cart-total-price">0.00</span></div>
+        <button class="checkout-btn" onclick="checkout()">Comprar</button>
+    </div>
+
+    <footer>
+        <h2>NutriVida - Tu salud en buenas manos</h2>
+        <p>¿Necesitas asesoría personalizada?</p>
+        <div style="margin-top: 15px;">
+            <!-- OTRO LUGAR PARA PONER TU ENLACE DE CONTACTO -->
+            <a href="https://www.instagram.com/nutrivida32875?utm_source=qr&igsh=cTMwanE0ZGtvaXIw" target="_blank" style="color: var(--primary-color); text-decoration: none; font-size: 1.2rem;">
+                👉 Haz clic aquí para contactarnos 👈
+            </a>
+        </div>
+    </footer>
+
+    <!-- ========================
+         JAVASCRIPT - FUNCIONALIDAD
+         ======================== -->
+    <script>
+        // Función para ocultar la pantalla de bienvenida
+        function enterStore() {
+            const welcomeScreen = document.getElementById('welcome-screen');
+            welcomeScreen.style.opacity = '0';
+            setTimeout(() => {
+                welcomeScreen.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Vuelve a permitir hacer scroll
+            }, 500);
+        }
+
+        // Base de datos simulada (Lista para futura integración con una API Backend como Node.js/MongoDB)
+        // IMÁGENES: Puedes reemplazar las URLs de Unsplash por las tuyas, por ejemplo: img: "imagenes/mi_proteina.png"
+        const inventory = [
+            { 
+                id: 1, category: "Suplementos Deportivos", sub: "Proteína", 
+                name: "NutriVida Whey Protein", 
+                shortDesc: "Aislado de proteína de suero puro.", 
+                detailedDesc: "Nuestra Whey Protein es de rápida absorción, ideal para tomar inmediatamente después de tu entrenamiento. Contiene 25g de proteína por servicio, cero azúcar añadida y está enriquecida con BCAAs para maximizar la recuperación muscular y evitar el catabolismo.",
+                price: 45.99, 
+                img: "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=600" 
+            },
+            { 
+                id: 2, category: "Suplementos Deportivos", sub: "Creatina", 
+                name: "NutriVida Creatine 100%", 
+                shortDesc: "Creatina monohidratada pura.", 
+                detailedDesc: "La creatina más pura del mercado. Ayuda a regenerar el ATP en el músculo, lo que se traduce en mayor fuerza explosiva, mejor rendimiento en entrenamientos de alta intensidad y un aumento notable en la masa muscular magra. Sin sabor, perfecta para mezclar con tu batido.",
+                price: 25.50, 
+                img: "https://images.unsplash.com/photo-1579722820308-d74e571900a9?w=600" 
+            },
+            { 
+                id: 3, category: "Suplementos Deportivos", sub: "Quemadores", 
+                name: "NutriVida Thermo-Burn", 
+                shortDesc: "Acelera el metabolismo.", 
+                detailedDesc: "Una fórmula termogénica avanzada con extracto de té verde, cafeína anhidra y L-Carnitina. Diseñada para elevar la temperatura corporal y utilizar las reservas de grasa como principal fuente de energía durante tus rutinas de cardio.",
+                price: 29.99, 
+                img: "https://cloudinary.images-iherb.com/image/upload/f_auto,q_auto:eco/images/nob/nob27413/y/49.jpg" 
+            },
+            { 
+                id: 4, category: "Vitaminas y Minerales", sub: "Vitaminas", 
+                name: "NutriVida MultiVit Plus", 
+                shortDesc: "Complejo vitamínico integral.", 
+                detailedDesc: "Cubre todas tus necesidades diarias de micronutrientes. Formulado específicamente para deportistas con un alto desgaste físico, fortalece el sistema inmunológico, mejora la vitalidad diaria y apoya la salud ósea con una alta dosis de Vitamina D y Calcio.",
+                price: 15.00, 
+                img: "https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=600" 
+            },
+            { 
+                id: 5, category: "Alimentos Saludables", sub: "Dietéticos", 
+                name: "NutriVida Keto Bars", 
+                shortDesc: "Snack bajo en carbohidratos.", 
+                detailedDesc: "El snack perfecto para matar los antojos sin romper tu dieta. Delicioso sabor a chocolate oscuro con trozos de almendra, aporta 15g de proteína, fibra prebiótica y menos de 2g de carbohidratos netos. Ideal para dietas cetogénicas o bajas en calorías.",
+                price: 10.99, 
+                img: "https://m.media-amazon.com/images/I/91e2tBVz9+L._AC_UF1000,1000_QL80_.jpg" 
+            }
+        ];
+
+        let cart = [];
+
+        // Renderizar el catálogo en la página
+        function renderStore() {
+            const storeContent = document.getElementById('store-content');
+            const categories = [...new Set(inventory.map(item => item.category))];
+
+            categories.forEach(category => {
+                const section = document.createElement('section');
+                section.id = category.split(' ')[0].toLowerCase();
+
+                const title = document.createElement('h2');
+                title.className = 'category-title';
+                title.innerText = category;
+                section.appendChild(title);
+
+                const grid = document.createElement('div');
+                grid.className = 'product-grid';
+
+                const categoryProducts = inventory.filter(item => item.category === category);
+                categoryProducts.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <img src="${product.img}" alt="${product.name}">
+                        <h3 style="font-size: 1.1rem; color: #2c3e50;">${product.name}</h3>
+                        <p style="font-size:0.8rem; color:#2ecc71; margin-bottom:5px;">${product.sub}</p>
+                        <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">${product.shortDesc}</p>
+                        <span class="product-price">$${product.price.toFixed(2)}</span>
+                        <!-- Al hacer clic, abre la ventana de detalles -->
+                        <button class="btn-view" onclick="openProductModal(${product.id})">Ver Detalles</button>
+                    `;
+                    grid.appendChild(card);
+                });
+
+                section.appendChild(grid);
+                storeContent.appendChild(section);
+            });
+        }
+
+        // --- LÓGICA DE LA VENTANA MODAL DE DETALLES ---
+        function openProductModal(productId) {
+            const product = inventory.find(p => p.id === productId);
+            if (!product) return;
+
+            // Llenar los datos del modal
+            document.getElementById('modal-img').src = product.img;
+            document.getElementById('modal-title').innerText = product.name;
+            document.getElementById('modal-price').innerText = `$${product.price.toFixed(2)}`;
+            document.getElementById('modal-desc').innerText = product.detailedDesc;
+            
+            // Configurar el botón de agregar al carrito del modal
+            const addBtn = document.getElementById('modal-btn-add');
+            addBtn.onclick = function() {
+                addToCart(product.id);
+                closeProductModal(); // Cierra el modal tras agregar
+            };
+
+            // Mostrar el modal
+            const modal = document.getElementById('product-modal');
+            modal.style.display = 'flex';
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').style.display = 'none';
+        }
+
+        // Cierra el modal si el usuario hace clic fuera de la ventana blanca
+        window.onclick = function(event) {
+            const modal = document.getElementById('product-modal');
+            if (event.target == modal) {
+                closeProductModal();
+            }
+        }
+
+        // --- LÓGICA DEL CARRITO ---
+        function toggleCart() {
+            document.getElementById('cart-panel').classList.toggle('open');
+        }
+
+        function addToCart(productId) {
+            const product = inventory.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) existingItem.quantity += 1;
+            else cart.push({ ...product, quantity: 1 });
+            
+            updateCartUI();
+            alert(`${product.name} agregado al carrito 🛒`);
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items-container');
+            const countBadge = document.getElementById('cart-count');
+            const totalPrice = document.getElementById('cart-total-price');
+
+            container.innerHTML = '';
+            if (cart.length === 0) {
+                container.innerHTML = '<p>El carrito está vacío.</p>';
+                countBadge.innerText = '0';
+                totalPrice.innerText = '0.00';
+                return;
+            }
+
+            let total = 0;
+            let totalItems = 0;
+
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+                totalItems += item.quantity;
+                container.innerHTML += `
+                    <div class="cart-item">
+                        <div>
+                            <h4 style="font-size:0.9rem;">${item.name}</h4>
+                            <p style="font-size:0.8rem; color:#666;">$${item.price.toFixed(2)} x ${item.quantity}</p>
+                        </div>
+                        <div style="font-weight:bold;">$${(item.price * item.quantity).toFixed(2)}</div>
+                    </div>
+                `;
+            });
+
+            countBadge.innerText = totalItems;
+            totalPrice.innerText = total.toFixed(2);
+        }
+
+        function checkout() {
+            if(cart.length === 0) {
+                alert("Tu carrito está vacío.");
+                return;
+            }
+            alert("¡Simulación de compra exitosa!\nEste flujo conectaría tu frontend con tu sistema de ventas y base de datos de inventario.");
+            cart = [];
+            updateCartUI();
+            toggleCart();
+        }
+
+        window.onload = renderStore;
+    </script>
+</body>
+</html>
